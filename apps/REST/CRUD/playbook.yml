@@ -1,0 +1,42 @@
+# This is a yaml comment
+
+# A colon separated list of hosts to run these tasks against.
+- hosts: webserver
+
+  # A list of tasks to perform on this remote server.
+  tasks:
+
+    # Naming each of these tasks is not necessary but is helpful
+    # if things go wrong as the names will appear in the debug.
+    - name: Install nodejs
+
+    	# You can 'become' with no qualifier to su to root
+      become: yes
+
+    	# You can write var=value
+      apt: name=nodejs update_cache=yes
+
+    - name: Install npm
+      become: yes
+      apt:
+    		# or you can write var: value. For more than 1 variable the colon
+    		# form is more readable so I use this from now on.
+        name: npm
+        update_cache: yes
+  - name: Create target direcotry
+
+    # There are lots of built in modules in Ansible to do common tasks.
+    file:
+      path: /home/ubuntu/apps
+      state: direcotry
+      # this chmod code is in octal so the leading 0 is important
+      mode: 0755
+
+  - name: Checkout app
+    git:
+      repo: https://github.com/encaitar/x.git
+      dest: /home/ubuntu/apps
+
+  - name: Install npm packages for our app
+    npm:
+      path: /home/ubuntu/apps
